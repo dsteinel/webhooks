@@ -64,7 +64,12 @@ class Plugin extends \craft\base\Plugin
             Event::on($webhook->class, $webhook->event, function(Event $e) use ($webhook) {
                 if ($webhook->type === 'post') {
                     // Build out the body data
-                    $data = [];
+                     $data = [
+                        'user' => $this->toArray($e->sender, $webhook->getUserAttributes()),
+                        'name' => $e->name,
+                        'sender' => $this->toArray($e->sender, $webhook->getSenderAttributes()),
+                        'event' => [],
+                    ];
                     $eventAttributes = $webhook->getEventAttributes();
                     $ref = new \ReflectionClass($e);
                     foreach (ArrayHelper::toArray($e, [], false) as $name => $value) {
