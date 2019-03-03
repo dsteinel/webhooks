@@ -62,28 +62,6 @@ class Plugin extends \craft\base\Plugin
 
         foreach ($webhooks as $webhook) {
             Event::on($webhook->class, $webhook->event, function(Event $e) use ($webhook) {
-                if ($webhook->type === 'post') {
-                    // Build out the body data
-                    $user = Craft::$app->getUser()->getIdentity();
-                    $data = [
-                        'time' => (new \DateTime())->format(\DateTime::ATOM),
-                        'user' => $user ? $this->toArray($user, $webhook->getUserAttributes()) : null,
-                        'name' => $e->name,
-                        'senderClass' => get_class($e->sender),
-                        'sender' => $this->toArray($e->sender, $webhook->getSenderAttributes()),
-                        'eventClass' => get_class($e),
-                        'event' => [],
-                    ];
-
-                    $eventAttributes = $webhook->getEventAttributes();
-                    $ref = new \ReflectionClass($e);
-                    foreach (ArrayHelper::toArray($e, [], false) as $name => $value) {
-                        if (!$ref->hasProperty($name) || $ref->getProperty($name)->getDeclaringClass()->getName() !== Event::class) {
-                            $data['event'][$name] = $this->toArray($value, $eventAttributes[$name] ?? []);
-                        }
-                    }
-                }
-
                 // Queue the send request up
                 Craft::$app->getQueue()->push(new SendWebhookJob([
                     'description' => Craft::t('webhooks', 'Sending webhook “{name}”', [
@@ -91,7 +69,7 @@ class Plugin extends \craft\base\Plugin
                     ]),
                     'type' => $webhook->type,
                     'url' => $webhook->url,
-                    'data' => $data ?? null,
+                    'data' => null,
                 ]));
             });
         }
