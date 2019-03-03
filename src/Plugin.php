@@ -65,7 +65,7 @@ class Plugin extends \craft\base\Plugin
                 if ($webhook->type === 'post') {
                     // Build out the body data
                      $data = [
-                        'user' => $this->toArray($e->sender, $webhook->getUserAttributes()),
+                        'user' => $this->toArray([], $webhook->getUserAttributes()),
                         'name' => $e->name,
                         'sender' => $this->toArray($e->sender, $webhook->getSenderAttributes()),
                         'event' => [],
