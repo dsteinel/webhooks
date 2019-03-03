@@ -62,7 +62,18 @@ class Plugin extends \craft\base\Plugin
 
         foreach ($webhooks as $webhook) {
             Event::on($webhook->class, $webhook->event, function(Event $e) use ($webhook) {
-                // Queue the send request up
+                if ($webhook->type === 'post') {
+                    // Build out the body data
+                    $data = [];
+                    $eventAttributes = $webhook->getEventAttributes();
+                    $ref = new \ReflectionClass($e);
+                    foreach (ArrayHelper::toArray($e, [], false) as $name => $value) {
+                        if (!$ref->hasProperty($name) || $ref->getProperty($name)->getDeclaringClass()->getName() !== Event::class) {
+                            $data['event'][$name] = $this->toArray($value, $eventAttributes[$name] ?? []);
+                        }
+                    }
+                }
+                
                 Craft::$app->getQueue()->push(new SendWebhookJob([
                     'description' => Craft::t('webhooks', 'Sending webhook “{name}”', [
                         'name' => $webhook->name,
