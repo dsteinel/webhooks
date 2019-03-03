@@ -67,7 +67,7 @@ class Plugin extends \craft\base\Plugin
                      $data = [
                         'user' => $this->toArray([], $webhook->getUserAttributes()),
                         'name' => $e->name,
-                        'sender' => $this->toArray($e->sender, $webhook->getSenderAttributes()),
+                        'sender' => $this->toArray([], $webhook->getSenderAttributes()),
                         'event' => [],
                     ];
                     $eventAttributes = $webhook->getEventAttributes();
