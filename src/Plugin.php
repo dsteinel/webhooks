@@ -80,7 +80,7 @@ class Plugin extends \craft\base\Plugin
                     ]),
                     'type' => $webhook->type,
                     'url' => $webhook->url,
-                    'data' => null,
+                    'data' => $data ?? null,
                 ]));
             });
         }
